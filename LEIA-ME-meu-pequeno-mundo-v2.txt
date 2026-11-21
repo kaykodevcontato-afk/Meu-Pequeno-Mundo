@@ -1,0 +1,19 @@
+MEU PEQUENO MUNDO — V2: BUSCA INTERNA DE MÚSICAS E VÍDEOS
+
+1. O arquivo meu-pequeno-mundo-v2.html já possui a interface de busca, com resultados, miniaturas, reprodução na própria página e salvamento nas listas.
+2. A pesquisa usa a YouTube Data API v3, que NÃO funciona sem configuração de chave. Não existe uma API separada oficial de busca para YouTube Kids.
+3. Abra https://console.cloud.google.com/ e crie um projeto; ative "YouTube Data API v3" e crie uma chave de API. Restrinja a chave para YouTube Data API v3.
+4. Crie um Cloudflare Worker, cole o arquivo youtube-pesquisa-cloudflare-worker.js, e configure em Settings > Variables and Secrets:
+   - YOUTUBE_API_KEY: segredo com a chave do Google (não deve aparecer no HTML)
+   - ALLOWED_ORIGIN: origem exata do site publicado, por exemplo https://seuusuario.github.io ou https://seudominio.pages.dev (sem barra final).
+5. Publique o HTML em um domínio HTTPS no GitHub Pages ou Cloudflare Pages. Na página Músicas, abra "Configurar pesquisa (administrador)", cole a URL HTTPS do Worker e salve.
+6. Teste as buscas em Músicas e Desenhos. Resultados podem ser reproduzidos no próprio site, salvo bloqueio de incorporação pelo YouTube.
+7. A YouTube Data API search.list custa 100 unidades de cota por consulta (padrão 10.000 unidades/dia, cerca de 100 consultas). Configure proteção contra abuso e rate limiting no Cloudflare antes de disponibilizar a clientes; proteção apenas por Origin não é autenticação.
+8. safeSearch strict e filtros infantis reduzem resultados inadequados mas NÃO substituem curadoria dos pais. O YouTube Kids não tem catálogo público de busca equivalente, e o site não se torna YouTube Kids por usar esses filtros.
+9. Reprodução incorporada pode dar erro 153 quando o navegador não envia Referer. Publique no HTTPS e não abra via file://. Vídeos sem permissão de incorporação também podem falhar.
+10. Para sites destinados a crianças é necessário respeitar a política "Made for Kids" do YouTube no player e a legislação aplicável, inclusive LGPD.
+
+ASSISTENTE IA
+- Consulte assistente-ia-cloudflare-worker.js. Para uso seguro, configure autenticação, limites de uso e segredo de API do provedor no servidor.
+
+Os demais dados do protótipo continuam guardados somente no navegador (localStorage), não sincronizados. Para uso comercial, implemente proteção de acesso, consentimento dos responsáveis e armazenamento seguro.
