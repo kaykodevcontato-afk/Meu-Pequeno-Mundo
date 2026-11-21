@@ -1,22 +1,27 @@
-MEU PEQUENO MUNDO — PESQUISA YOUTUBE
+MEU PEQUENO MUNDO — PLAYER YOUTUBE + PESQUISA
 
-COMO FUNCIONA
-Sem a API, a pesquisa oferece um link para abrir os resultados no YouTube.
-Com uma API válida, os resultados aparecem no próprio site, podendo selecionar, reproduzir (quando permitido pelo YouTube) e salvar.
+ATUALIZAÇÃO
+- YouTube IFrame Player API integrada às áreas de músicas e desenhos.
+- Vídeos selecionados reproduzem dentro do site se o YouTube permitir.
+- Não há interrupção automática após 6 segundos (isso era somente no exemplo da documentação).
+- A sessão de desenhos mantém o limite definido no campo "Tempo por sessão" (10 minutos por padrão).
+- Se a API de player não carregar, os controles nativos do vídeo incorporado continuam disponíveis.
+- Interface pública não apresenta formulários técnicos de API.
 
-CONFIGURAÇÃO PARA TODOS OS VISITANTES
-1. Ative YouTube Data API v3 no Google Cloud.
-2. Crie uma chave e restrinja-a à YouTube Data API v3 e ao referer do seu domínio publicado (ex.: https://usuario.github.io/*). Defina cotas.
-3. Abra configuracao.js e preencha youtubeApiKey com a chave restrita.
-4. Publique index.html e configuracao.js no mesmo diretório.
+ATIVAR PESQUISA DENTRO DO SITE
+1. Entre em https://console.cloud.google.com/apis/library/youtube.googleapis.com e ative YouTube Data API v3.
+2. Crie credencial de chave API no Google Cloud; restrinja para seu domínio GitHub Pages e somente essa API. Configure cotas.
+3. Edite configuracao.js e preencha youtubeApiKey com a chave de uso no navegador, restrita por domínio e API.
+4. Envie index.html e configuracao.js à raiz do repositório GitHub Pages.
 
-OPÇÃO MAIS SEGURA
-Coloque a chave SECRETA no backend (ex.: Cloudflare Worker, com proteção e limites) e configure youtubeSearchEndpoint no configuracao.js. Esse backend deve responder JSON { items: [{ id, title, channel }], nextPageToken } e permitir CORS do seu domínio.
+ALTERNATIVA MAIS SEGURA
+Um endpoint HTTPS próprio configurado em youtubeSearchEndpoint permite manter a chave no servidor (ex.: Cloudflare Worker), com CORS, limites e autenticação adequados.
 
-NOTAS
-Configurações de administrador na interface só aparecem com ?admin=1. Esse parâmetro NÃO é autenticação.
-Configuração feita por esse painel salva somente no navegador atual. Para todos os visitantes, edite configuracao.js.
-A pesquisa exige API; o YouTube não disponibiliza pesquisa oficial arbitrária incorporada sem API.
-Filtros não garantem adequação infantil: supervisione os vídeos.
+SEM CHAVE
+A pesquisa de vídeos pelo nome no próprio site não é possível sem YouTube Data API v3 ou endpoint equivalente.
+Nesse caso, aparece apenas um link para buscar no YouTube e o usuário pode adicionar vídeos pelo link.
 
-PRIVACIDADE: esta versão não inclui o e-mail pessoal informado no HTML, JS ou arquivos do pacote. O painel técnico de configuração da busca foi ocultado dos visitantes. Para pesquisar DENTRO do site, ainda é obrigatório configurar um endpoint HTTPS ou a chave pública com restrição no arquivo configuracao.js. Sem isso, a pesquisa abre o YouTube em outra aba.
+OBSERVAÇÕES
+A IFrame Player API não realiza pesquisa. Alguns vídeos não permitem incorporação; a filtragem safeSearch não substitui supervisão parental.
+Não coloque segredos de backend em configuracao.js: o código do navegador é público.
+O pacote não contém o e-mail pessoal mencionado anteriormente.

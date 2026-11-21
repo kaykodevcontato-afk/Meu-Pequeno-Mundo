@@ -63,33 +63,15 @@ $('addMusic').onclick=()=>{let ref=youtubeRef(safeVal('musicUrl'));if(!ref||!saf
 $('addVideo').onclick=()=>{let ref=youtubeRef(safeVal('videoUrl'));if(!ref||ref.kind!=='video'||!safeVal('videoTitle'))return alert('Informe um título e link válido de vídeo do YouTube.');data.videos.push({id:uid(),title:safeVal('videoTitle'),ref});$('videoTitle').value='';$('videoUrl').value='';save();render()};
 // Pesquisa YouTube: suporte a chave pública de API restrita por domínio ou endpoint de servidor.
 // Chave digitada pelo administrador não entra nos backups da família.
-const ytKeyStorage="mpm-youtube-public-api-key";
-const getYtKey=()=>{try{return String(window.MPM_CONFIG?.youtubeApiKey||localStorage.getItem(ytKeyStorage)||'').trim()}catch{return String(window.MPM_CONFIG?.youtubeApiKey||'').trim()}};
+const getYtKey=()=>String(window.MPM_CONFIG?.youtubeApiKey||'').trim();
 const ytSearchState={musics:{next:'',query:''},videos:{next:'',query:''}};
 function renderSearchPanel(type){
  const music=type==='musics',prefix=music?'music':'video';
- $(prefix+'Search').innerHTML=`<div class="media-search"><h3>🔎 Buscar ${music?'músicas':'vídeos'} no YouTube</h3><form id="${prefix}SearchForm"><input id="${prefix}SearchInput" aria-label="Pesquisar ${music?'músicas':'vídeos'}" placeholder="${music?'Ex.: canções de ninar, música para bebê':'Ex.: histórias infantis, desenhos educativos'}" maxlength="100" required/><button class="btn primary" type="submit">Pesquisar</button></form><div class="media-quick">${(music?['Canções de ninar','Música educativa','Música para dormir','Músicas calmas']:['Histórias infantis','Desenhos educativos','Alfabeto infantil','Animais para crianças']).map(q=>`<button class="btn secondary" type="button" data-quick="${esc(q)}">${esc(q)}</button>`).join('')}</div><p class="media-search-status" id="${prefix}SearchStatus" role="status">Pesquise músicas e vídeos infantis. A reprodução integrada depende das permissões do YouTube.</p><div id="${prefix}Results"></div>${music?`<details id="ytAdminConfig"><summary>⚙ Configurar busca do YouTube (administrador)</summary><p class="sub">Ative a YouTube Data API v3 no Google Cloud e gere uma chave de API com restrição por site e restrição à YouTube Data API v3. A chave usada no navegador fica visível aos visitantes: não utilize uma chave secreta ou sem restrições. Para maior controle, use um servidor intermediário.</p><div class="field"><label for="youtubePublicKeyInput">Chave de API do YouTube (modo simples)</label><input type="password" id="youtubePublicKeyInput" placeholder="Cole sua chave restrita do Google Cloud" autocomplete="off"/></div><div class="field"><label for="youtubeSearchEndpointInput">Ou endereço HTTPS do servidor de pesquisa (opcional)</label><input type="url" id="youtubeSearchEndpointInput" placeholder="https://seu-worker.workers.dev" autocomplete="off"/></div><div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" id="saveYoutubeSearchConfig" class="btn primary">Salvar configuração</button><button type="button" id="clearYoutubeSearchConfig" class="btn secondary">Remover configuração</button></div><p class="sub">Configuração salva apenas neste navegador. Se publicar o site para outras famílias, prefira configurar o servidor de pesquisa. <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer">Ativar API no Google Cloud</a>.</p></details>`:''}<button class="btn secondary hidden" id="${prefix}SearchMore" type="button">Mostrar mais resultados</button></div>`;
+ $(prefix+'Search').innerHTML=`<div class="media-search"><h3>🔎 Buscar ${music?'músicas':'vídeos'} no YouTube</h3><form id="${prefix}SearchForm"><input id="${prefix}SearchInput" aria-label="Pesquisar ${music?'músicas':'vídeos'}" placeholder="${music?'Ex.: canções de ninar, música para bebê':'Ex.: histórias infantis, desenhos educativos'}" maxlength="100" required/><button class="btn primary" type="submit">Pesquisar</button></form><div class="media-quick">${(music?['Canções de ninar','Música educativa','Música para dormir','Músicas calmas']:['Histórias infantis','Desenhos educativos','Alfabeto infantil','Animais para crianças']).map(q=>`<button class="btn secondary" type="button" data-quick="${esc(q)}">${esc(q)}</button>`).join('')}</div><p class="media-search-status" id="${prefix}SearchStatus" role="status">Pesquise músicas e vídeos infantis. A reprodução integrada depende das permissões do YouTube.</p><div id="${prefix}Results"></div><button class="btn secondary hidden" id="${prefix}SearchMore" type="button">Mostrar mais resultados</button></div>`;
  $(prefix+'SearchForm').onsubmit=e=>{e.preventDefault();runYoutubeSearch(type,false)};
  $(prefix+'Search').querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>{$(prefix+'SearchInput').value=b.dataset.quick;runYoutubeSearch(type,false)});
  $(prefix+'SearchMore').onclick=()=>runYoutubeSearch(type,true);
- if(music){
-   $('ytAdminConfig').hidden = !new URLSearchParams(location.search).has('admin');
-   $('youtubePublicKeyInput').value=getYtKey();
-   $('youtubeSearchEndpointInput').value=data.youtubeSearchEndpoint||'';
-   $('saveYoutubeSearchConfig').onclick=()=>{
-     const key=$('youtubePublicKeyInput').value.trim(),url=$('youtubeSearchEndpointInput').value.trim();
-     if(url&&!/^https:\/\//i.test(url))return alert('Use uma URL HTTPS para o servidor.');
-     if(!key&&!url)return alert('Informe uma chave de API restrita ou o endereço do servidor de pesquisa.');
-     try{if(key)localStorage.setItem(ytKeyStorage,key);else localStorage.removeItem(ytKeyStorage)}catch{return alert('Não foi possível armazenar a chave neste navegador.')}
-     data.youtubeSearchEndpoint=url;save();
-     $('musicSearchStatus').textContent='Configuração salva. Faça uma pesquisa para testar.';
-   };
-   $('clearYoutubeSearchConfig').onclick=()=>{
-     try{localStorage.removeItem(ytKeyStorage)}catch{}data.youtubeSearchEndpoint='';save();
-     $('youtubePublicKeyInput').value='';$('youtubeSearchEndpointInput').value='';
-     $('musicSearchStatus').textContent='Configuração removida.';
-   };
- }
+
 
 }
 renderSearchPanel('musics');renderSearchPanel('videos');
@@ -152,17 +134,64 @@ async function runYoutubeSearch(type,more){
    status.textContent=`${items.length} resultado(s) encontrado(s). Escolha um vídeo para assistir.`;
  }catch(err){status.textContent=err.message||'Não foi possível pesquisar. Verifique sua conexão.';}
 }
+// YouTube IFrame Player API: controls the embedded player, without a six-second cutoff.
+let videoTimer, ytApiPromise, activeYT={music:null,video:null};
+function loadYouTubePlayerApi(){
+ if(window.YT?.Player)return Promise.resolve(window.YT);
+ if(ytApiPromise)return ytApiPromise;
+ ytApiPromise=new Promise((resolve,reject)=>{
+  const previous=window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady=()=>{if(typeof previous==='function')previous();resolve(window.YT)};
+  const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.async=true;
+  script.onerror=()=>reject(new Error('Não foi possível carregar o controle do YouTube.'));
+  document.head.appendChild(script);
+ });
+ return ytApiPromise;
+}
+function videoIframe(ref,title){
+ const url=new URL(ref.kind==='playlist'?'https://www.youtube-nocookie.com/embed/videoseries':'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(ref.id));
+ if(ref.kind==='playlist')url.searchParams.set('list',ref.id);
+ url.searchParams.set('rel','0');url.searchParams.set('playsinline','1');url.searchParams.set('enablejsapi','1');
+ if(location.protocol==='https:'||location.protocol==='http:')url.searchParams.set('origin',location.origin);
+ return `<iframe src="${esc(url.href)}" title="${esc(title)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+}
+function clearCurrentPlayer(type){
+ const key=type==='musics'?'music':'video';
+ const p=activeYT[key];activeYT[key]=null;
+ if(p){try{p.destroy()}catch{}}
+ if(key==='video')clearTimeout(videoTimer);
+}
+async function showMediaPlayer(type,ref,title){
+ const music=type==='musics',key=music?'music':'video',target=music?'musicPlace':'videoPlace';
+ clearCurrentPlayer(type);
+ const host=$(target);host.className='';host.innerHTML=videoIframe(ref,title);
+ const frame=host.querySelector('iframe');
+ if(!music){
+  const minutes=Math.min(120,Math.max(1,Number($('videoMinutes').value)||10));
+  $('watchTime').textContent='Sessão de até '+minutes+' minutos';
+  // O limite configurado pelo responsável continua ativo; NÃO há parada automática de 6 segundos.
+  videoTimer=setTimeout(stopVideo,minutes*60000);
+ }
+ // If the IFrame API cannot load, embedded video still has its own native controls.
+ try{
+  const YT=await loadYouTubePlayerApi();
+  if(!frame.isConnected)return;
+  const player=new YT.Player(frame,{events:{onReady:()=>{},onStateChange:()=>{}}});
+  activeYT[key]=player;
+ }catch(e){console.warn('Player do YouTube: controles nativos disponíveis.',e)}
+}
+window.playMedia=(type,id)=>{
+ const item=data[type]?.find(x=>x.id===id),ref=item?.ref||(item?.videoId?{kind:'video',id:item.videoId}:null);
+ if(ref)showMediaPlayer(type,ref,item.title);
+};
 function playSearchedVideo(type,id,title){
  if(!/^[a-zA-Z0-9_-]{11}$/.test(id))return;
- const target=type==='musics'?'musicPlace':'videoPlace';
- $(target).className='';$(target).innerHTML=videoIframe({kind:'video',id},title);
- if(type==='videos'){clearTimeout(videoTimer);let minutes=Math.min(120,Math.max(1,Number($('videoMinutes').value)||10));$('watchTime').textContent='Sessão de até '+minutes+' minutos';videoTimer=setTimeout(stopVideo,minutes*60000)}
- $(target).scrollIntoView({behavior:'smooth',block:'center'});
+ showMediaPlayer(type,{kind:'video',id},title);
+ $(type==='musics'?'musicPlace':'videoPlace').scrollIntoView({behavior:'smooth',block:'center'});
 }
-
-let videoTimer;function videoIframe(ref,title){let url=ref.kind==='playlist'?`https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(ref.id)}`:`https://www.youtube-nocookie.com/embed/${encodeURIComponent(ref.id)}`;return `<iframe src="${url}&rel=0" title="${esc(title)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>`.replace('/embed/'+encodeURIComponent(ref.id)+'&rel=','/embed/'+encodeURIComponent(ref.id)+'?rel=')}
-window.playMedia=(type,id)=>{let item=data[type].find(x=>x.id===id),ref=item?.ref||(item?.videoId?{kind:'video',id:item.videoId}:null);if(!ref)return;let target=type==='musics'?'musicPlace':'videoPlace';$(target).className='';$(target).innerHTML=videoIframe(ref,item.title);if(type==='videos'){clearTimeout(videoTimer);let minutes=Math.min(120,Math.max(1,Number($('videoMinutes').value)||10));$('watchTime').textContent='Sessão de até '+minutes+' minutos';videoTimer=setTimeout(stopVideo,minutes*60000)}};
-function stopVideo(){clearTimeout(videoTimer);$('videoPlace').className='warning';$('videoPlace').textContent='Sessão encerrada.';$('watchTime').textContent='Nenhum vídeo ativo'}$('stopVideo').onclick=stopVideo;$('stopMusic').onclick=()=>{$('musicPlace').className='warning';$('musicPlace').textContent='Escolha uma música para começar.'};
+function stopVideo(){clearCurrentPlayer('videos');$('videoPlace').className='warning';$('videoPlace').textContent='Sessão encerrada.';$('watchTime').textContent='Nenhum vídeo ativo'}
+$('stopVideo').onclick=stopVideo;
+$('stopMusic').onclick=()=>{clearCurrentPlayer('musics');$('musicPlace').className='warning';$('musicPlace').textContent='Escolha uma música para começar.'};
 // Guidance fallback is curated, not artificially presented as model-generated content.
 const guides={
 'Brincadeiras para a idade':[['Converse e cante durante os cuidados.','Mostre objetos de alto contraste e observe o interesse do bebê.','Faça momentos curtos de bruços quando acordado, sempre com supervisão.'],['Brinque de esconder e revelar seu rosto.','Explore sons suaves, livros resistentes e brinquedos seguros.','Deixe o bebê alcançar objetos sem peças pequenas.'],['Brinque de empilhar objetos grandes, apontar imagens e nomear coisas.','Cante músicas com gestos e incentive a imitação.','Ofereça brincadeiras com movimentos seguros e supervisão.'],['Faça jogos de faz de conta, leitura, desenhos e classificação de cores.','Brinque ao ar livre com supervisão.','Estimule turnos de conversa e curiosidade.']],
