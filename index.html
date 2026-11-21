@@ -60,15 +60,35 @@ $('exportJson').onclick=()=>{let a=document.createElement('a'),url=URL.createObj
 function youtubeRef(value){try{let u=new URL(value),host=u.hostname.toLowerCase();if(host==='youtu.be'){let id=u.pathname.slice(1);return /^[\w-]{11}$/.test(id)?{kind:'video',id}:null}if(['youtube.com','www.youtube.com','m.youtube.com','music.youtube.com','www.youtube-nocookie.com','youtube-nocookie.com'].includes(host)){let pid=u.searchParams.get('list');if(pid&&/^[\w-]{12,}$/.test(pid))return {kind:'playlist',id:pid};let id=u.searchParams.get('v')||(u.pathname.match(/^\/(?:embed|shorts|live)\/([\w-]{11})/)||[])[1];return /^[\w-]{11}$/.test(id||'')?{kind:'video',id}:null}}catch{}return null}
 $('addMusic').onclick=()=>{let ref=youtubeRef(safeVal('musicUrl'));if(!ref||!safeVal('musicTitle'))return alert('Informe um título e link válido do YouTube.');data.musics.push({id:uid(),title:safeVal('musicTitle'),ref});$('musicTitle').value='';$('musicUrl').value='';save();render()};
 $('addVideo').onclick=()=>{let ref=youtubeRef(safeVal('videoUrl'));if(!ref||ref.kind!=='video'||!safeVal('videoTitle'))return alert('Informe um título e link válido de vídeo do YouTube.');data.videos.push({id:uid(),title:safeVal('videoTitle'),ref});$('videoTitle').value='';$('videoUrl').value='';save();render()};
-// Pesquisa interna YouTube. Preferir endpoint de servidor; nunca armazenar chave secreta no HTML.
+// Pesquisa YouTube: suporte a chave pública de API restrita por domínio ou endpoint de servidor.
+// Chave digitada pelo administrador não entra nos backups da família.
+const ytKeyStorage="mpm-youtube-public-api-key";
+const getYtKey=()=>{try{return localStorage.getItem(ytKeyStorage)||""}catch{return ""}};
 const ytSearchState={musics:{next:'',query:''},videos:{next:'',query:''}};
 function renderSearchPanel(type){
  const music=type==='musics',prefix=music?'music':'video';
- $(prefix+'Search').innerHTML=`<div class="media-search"><h3>🔎 Buscar ${music?'músicas':'vídeos'} no YouTube</h3><form id="${prefix}SearchForm"><input id="${prefix}SearchInput" aria-label="Pesquisar ${music?'músicas':'vídeos'}" placeholder="${music?'Ex.: canções de ninar, música para bebê':'Ex.: histórias infantis, desenhos educativos'}" maxlength="100" required/><button class="btn primary" type="submit">Pesquisar</button></form><div class="media-quick">${(music?['Canções de ninar','Música educativa','Música para dormir','Músicas calmas']:['Histórias infantis','Desenhos educativos','Alfabeto infantil','Animais para crianças']).map(q=>`<button class="btn secondary" type="button" data-quick="${esc(q)}">${esc(q)}</button>`).join('')}</div><p class="media-search-status" id="${prefix}SearchStatus" role="status">Encontre e reproduza conteúdos sem sair do site.</p><div id="${prefix}Results"></div>${music?`<details><summary>Configurar pesquisa (administrador)</summary><div class="field"><label>Endereço HTTPS da API de pesquisa</label><input type="url" id="youtubeSearchEndpointInput" placeholder="https://seu-worker.workers.dev" autocomplete="off"/></div><button type="button" id="saveYoutubeSearchEndpoint" class="btn secondary">Salvar configuração</button></details>`:''}<button class="btn secondary hidden" id="${prefix}SearchMore" type="button">Mostrar mais resultados</button></div>`;
+ $(prefix+'Search').innerHTML=`<div class="media-search"><h3>🔎 Buscar ${music?'músicas':'vídeos'} no YouTube</h3><form id="${prefix}SearchForm"><input id="${prefix}SearchInput" aria-label="Pesquisar ${music?'músicas':'vídeos'}" placeholder="${music?'Ex.: canções de ninar, música para bebê':'Ex.: histórias infantis, desenhos educativos'}" maxlength="100" required/><button class="btn primary" type="submit">Pesquisar</button></form><div class="media-quick">${(music?['Canções de ninar','Música educativa','Música para dormir','Músicas calmas']:['Histórias infantis','Desenhos educativos','Alfabeto infantil','Animais para crianças']).map(q=>`<button class="btn secondary" type="button" data-quick="${esc(q)}">${esc(q)}</button>`).join('')}</div><p class="media-search-status" id="${prefix}SearchStatus" role="status">Encontre e reproduza conteúdos sem sair do site.</p><div id="${prefix}Results"></div>${music?`<details id="ytAdminConfig"><summary>⚙ Configurar busca do YouTube (administrador)</summary><p class="sub">Ative a YouTube Data API v3 no Google Cloud e gere uma chave de API com restrição por site e restrição à YouTube Data API v3. A chave usada no navegador fica visível aos visitantes: não utilize uma chave secreta ou sem restrições. Para maior controle, use um servidor intermediário.</p><div class="field"><label for="youtubePublicKeyInput">Chave de API do YouTube (modo simples)</label><input type="password" id="youtubePublicKeyInput" placeholder="Cole sua chave restrita do Google Cloud" autocomplete="off"/></div><div class="field"><label for="youtubeSearchEndpointInput">Ou endereço HTTPS do servidor de pesquisa (opcional)</label><input type="url" id="youtubeSearchEndpointInput" placeholder="https://seu-worker.workers.dev" autocomplete="off"/></div><div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" id="saveYoutubeSearchConfig" class="btn primary">Salvar configuração</button><button type="button" id="clearYoutubeSearchConfig" class="btn secondary">Remover configuração</button></div><p class="sub">Configuração salva apenas neste navegador. Se publicar o site para outras famílias, prefira configurar o servidor de pesquisa. <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer">Ativar API no Google Cloud</a>.</p></details>`:''}<button class="btn secondary hidden" id="${prefix}SearchMore" type="button">Mostrar mais resultados</button></div>`;
  $(prefix+'SearchForm').onsubmit=e=>{e.preventDefault();runYoutubeSearch(type,false)};
  $(prefix+'Search').querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>{$(prefix+'SearchInput').value=b.dataset.quick;runYoutubeSearch(type,false)});
  $(prefix+'SearchMore').onclick=()=>runYoutubeSearch(type,true);
- if(music){$('youtubeSearchEndpointInput').value=data.youtubeSearchEndpoint||'';$('saveYoutubeSearchEndpoint').onclick=()=>{const v=$('youtubeSearchEndpointInput').value.trim();if(v&&!/^https:\/\//i.test(v))return alert('Use uma URL HTTPS.');data.youtubeSearchEndpoint=v;save();$('musicSearchStatus').textContent=v?'Pesquisa ativada.':'Configuração removida.';};}
+ if(music){
+   $('youtubePublicKeyInput').value=getYtKey();
+   $('youtubeSearchEndpointInput').value=data.youtubeSearchEndpoint||'';
+   $('saveYoutubeSearchConfig').onclick=()=>{
+     const key=$('youtubePublicKeyInput').value.trim(),url=$('youtubeSearchEndpointInput').value.trim();
+     if(url&&!/^https:\/\//i.test(url))return alert('Use uma URL HTTPS para o servidor.');
+     if(!key&&!url)return alert('Informe uma chave de API restrita ou o endereço do servidor de pesquisa.');
+     try{if(key)localStorage.setItem(ytKeyStorage,key);else localStorage.removeItem(ytKeyStorage)}catch{return alert('Não foi possível armazenar a chave neste navegador.')}
+     data.youtubeSearchEndpoint=url;save();
+     $('musicSearchStatus').textContent='Configuração salva. Faça uma pesquisa para testar.';
+   };
+   $('clearYoutubeSearchConfig').onclick=()=>{
+     try{localStorage.removeItem(ytKeyStorage)}catch{}data.youtubeSearchEndpoint='';save();
+     $('youtubePublicKeyInput').value='';$('youtubeSearchEndpointInput').value='';
+     $('musicSearchStatus').textContent='Configuração removida.';
+   };
+ }
+
 }
 renderSearchPanel('musics');renderSearchPanel('videos');
 async function runYoutubeSearch(type,more){
@@ -77,16 +97,33 @@ async function runYoutubeSearch(type,more){
  if(!more){state.next='';state.query=query;$(prefix+'Results').innerHTML='';}
  const status=$(prefix+'SearchStatus'),btn=$(prefix+'SearchMore');btn.classList.add('hidden');
  status.textContent='Pesquisando no YouTube…';
- const endpoint=String(data.youtubeSearchEndpoint||'').trim();
- if(!/^https:\/\//i.test(endpoint)){
-   status.textContent='Pesquisa ainda não configurada. O responsável pelo site precisa ativar a busca do YouTube.';
+ const endpoint=String(data.youtubeSearchEndpoint||'').trim(),apiKey=getYtKey();
+ if(!endpoint&&!apiKey){
+   status.textContent='Busca não ativada neste navegador. Abra “Configurar busca do YouTube (administrador)” na aba Músicas para inserir uma chave de API ou endereço do servidor.';
    return;
  }
  try{
-   const u=new URL(endpoint);u.searchParams.set('q',state.query);u.searchParams.set('category',type==='musics'?'music':'video');if(more&&state.next)u.searchParams.set('pageToken',state.next);
+   let u;
+   if(endpoint){
+     u=new URL(endpoint);u.searchParams.set('q',state.query);u.searchParams.set('category',type==='musics'?'music':'video');
+     if(more&&state.next)u.searchParams.set('pageToken',state.next);
+   }else{
+     u=new URL('https://www.googleapis.com/youtube/v3/search');
+     u.searchParams.set('part','snippet');u.searchParams.set('type','video');u.searchParams.set('maxResults','12');
+     u.searchParams.set('safeSearch','strict');u.searchParams.set('videoEmbeddable','true');
+     u.searchParams.set('relevanceLanguage','pt');u.searchParams.set('regionCode','BR');
+     u.searchParams.set('q',(type==='musics'?'música infantil para bebês ':'desenho educativo infantil ')+state.query);
+     u.searchParams.set('key',apiKey);
+     if(more&&state.next)u.searchParams.set('pageToken',state.next);
+   }
    const response=await fetch(u.href,{method:'GET',headers:{Accept:'application/json'}});
    const payload=await response.json().catch(()=>({}));
-   if(!response.ok)throw new Error(payload.error||'Não foi possível pesquisar agora.');
+   if(!response.ok){
+     const msg=payload.error?.message||payload.error||'Não foi possível pesquisar agora.';
+     throw new Error(String(msg).slice(0,260));
+   }
+   // Normaliza tanto as respostas do proxy quanto da API oficial do YouTube.
+   if(!endpoint&&Array.isArray(payload.items))payload.items=payload.items.map(x=>({id:x.id?.videoId,title:x.snippet?.title,channel:x.snippet?.channelTitle}));
    const items=Array.isArray(payload.items)?payload.items:[];
    if(!items.length){status.textContent=more?'Não há mais resultados.':'Nenhum resultado encontrado. Tente outra pesquisa.';return;}
    const cards=items.filter(x=>/^[a-zA-Z0-9_-]{11}$/.test(String(x.id||''))).map(x=>{
