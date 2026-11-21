@@ -18,3 +18,5 @@ Configurações de administrador na interface só aparecem com ?admin=1. Esse pa
 Configuração feita por esse painel salva somente no navegador atual. Para todos os visitantes, edite configuracao.js.
 A pesquisa exige API; o YouTube não disponibiliza pesquisa oficial arbitrária incorporada sem API.
 Filtros não garantem adequação infantil: supervisione os vídeos.
+
+PRIVACIDADE: esta versão não inclui o e-mail pessoal informado no HTML, JS ou arquivos do pacote. O painel técnico de configuração da busca foi ocultado dos visitantes. Para pesquisar DENTRO do site, ainda é obrigatório configurar um endpoint HTTPS ou a chave pública com restrição no arquivo configuracao.js. Sem isso, a pesquisa abre o YouTube em outra aba.
