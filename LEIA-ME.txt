@@ -1,15 +1,20 @@
-MEU PEQUENO MUNDO — ATUALIZAÇÃO DA PESQUISA YOUTUBE
+MEU PEQUENO MUNDO — PESQUISA YOUTUBE
 
-1. Abra index.html em um navegador ou publique-o no GitHub Pages.
-2. Vá à seção Músicas > Configurar busca do YouTube (administrador).
-3. No Google Cloud Console, ative YouTube Data API v3 e crie uma chave de API.
-4. Restrinja a chave: Restrição de API = YouTube Data API v3; Restrição de aplicação = Sites (HTTP referrers). Cadastre o domínio de publicação, ex.: https://SEU-USUARIO.github.io/* . Para testes locais, a restrição por HTTP referrer pode impedir solicitações via file://; prefira testar no domínio publicado.
-5. Cole a chave na configuração e clique Salvar. Faça uma pesquisa.
-6. Alternativamente, forneça uma URL HTTPS de um backend próprio que aceite q, category, pageToken e retorne {items:[{id,title,channel}],nextPageToken}.
+COMO FUNCIONA
+Sem a API, a pesquisa oferece um link para abrir os resultados no YouTube.
+Com uma API válida, os resultados aparecem no próprio site, podendo selecionar, reproduzir (quando permitido pelo YouTube) e salvar.
 
-SEGURANÇA E LIMITAÇÕES
-- Uma chave de API usada diretamente pelo navegador é visível a usuários do site. A opção direta é indicada apenas para testes ou sites controlados, com chave rigidamente restrita e cotas monitoradas. Para site público, é preferível usar um backend/Cloudflare Worker, com a chave guardada como segredo no servidor e controles de abuso.
-- A configuração da chave fica apenas no armazenamento local do navegador e NÃO é exportada junto do backup familiar. Em outro navegador, o administrador deve configurar novamente.
-- A API tem cotas, e nem todos os vídeos permitem reprodução incorporada. safeSearch=strict ajuda, mas não garante conteúdo adequado para bebês: supervisão responsável continua necessária.
-- Não informe senhas de conta Google, apenas uma chave de API com restrições.
-- Os demais dados do bebê continuam locais no navegador. Fazer backup periodicamente.
+CONFIGURAÇÃO PARA TODOS OS VISITANTES
+1. Ative YouTube Data API v3 no Google Cloud.
+2. Crie uma chave e restrinja-a à YouTube Data API v3 e ao referer do seu domínio publicado (ex.: https://usuario.github.io/*). Defina cotas.
+3. Abra configuracao.js e preencha youtubeApiKey com a chave restrita.
+4. Publique index.html e configuracao.js no mesmo diretório.
+
+OPÇÃO MAIS SEGURA
+Coloque a chave SECRETA no backend (ex.: Cloudflare Worker, com proteção e limites) e configure youtubeSearchEndpoint no configuracao.js. Esse backend deve responder JSON { items: [{ id, title, channel }], nextPageToken } e permitir CORS do seu domínio.
+
+NOTAS
+Configurações de administrador na interface só aparecem com ?admin=1. Esse parâmetro NÃO é autenticação.
+Configuração feita por esse painel salva somente no navegador atual. Para todos os visitantes, edite configuracao.js.
+A pesquisa exige API; o YouTube não disponibiliza pesquisa oficial arbitrária incorporada sem API.
+Filtros não garantem adequação infantil: supervisione os vídeos.
