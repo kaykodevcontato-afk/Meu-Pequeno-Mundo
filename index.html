@@ -22,8 +22,8 @@
 <div class="card"><h3>Para cada idade 👶</h3><p class="sub" id="aiAgeLabel">Cadastre a data de nascimento para personalizar as dicas.</p><p class="sub">Em situações de saúde, procure orientação profissional.</p></div>
 <div class="card full"><div class="ai-chip-row" id="aiSuggestions"><button type="button" class="btn secondary" data-ask="Que brincadeiras posso fazer hoje?">🧩 Brincadeiras</button><button type="button" class="btn secondary" data-ask="Como criar uma rotina de sono tranquila e segura?">🌙 Sono</button><button type="button" class="btn secondary" data-ask="Quais cuidados gerais com a alimentação nesta idade?">🥣 Alimentação</button><button type="button" class="btn secondary" data-ask="Como estimular a linguagem e o aprendizado com brincadeiras?">📚 Aprendizado</button><button type="button" class="btn secondary" data-ask="Que atividades posso fazer sem telas?">🎨 Atividades sem telas</button></div>
 <div class="formgrid"><div class="field"><label for="aiTopic">Assunto</label><select id="aiTopic"><option>Brincadeiras para a idade</option><option>Educação e desenvolvimento</option><option>Alimentação adequada à idade</option><option>Sono e rotina</option><option>Leitura e primeiras palavras</option><option>Perguntas para o pediatra</option><option>Planejamento dos estudos</option></select></div><div class="field"><label for="aiExtra">O que você gostaria de saber?</label><textarea id="aiExtra" rows="3" placeholder="Ex.: Que brincadeira é adequada para um bebê de 8 meses?" maxlength="500"></textarea></div></div>
-<div class="row" style="flex-wrap:wrap"><button class="btn primary" id="generatePrompt">✨ Pedir orientação</button><button class="btn secondary" id="copyPrompt">Copiar resposta</button></div>
-<div aria-live="polite" class="ai-answer" id="aiOutput">Escolha um tema acima ou escreva sua pergunta.</div><p class="sub" id="aiModeNotice">Dicas para cada fase da infância</p></div></div></section><section class="content" id="poupanca"><div class="grid"><div class="card hero"><div><div class="eyebrow">Planos para o futuro</div><h2>Poupança para os estudos 🎓</h2><p class="sub">Acompanhe quanto a família está reservando para educação.</p></div><div class="illustration">🎓</div></div><div class="card"><h3>Minha meta</h3><div class="field"><label>Objetivo (R$)</label><input id="savingGoal" min="0" step="0.01" type="number" value="10000"/></div><div class="field"><label>Saldo inicial (R$)</label><input id="savingStart" min="0" step="0.01" type="number" value="0"/></div><div class="field"><label>Contribuição mensal planejada (R$)</label><input id="savingMonthly" min="0" step="0.01" type="number" value="100"/></div><button class="btn primary" id="saveGoal">Salvar plano</button></div><div class="card"><h3>Meu progresso</h3><div class="metric" id="savedTotal">R$ 0,00</div><div class="sub" id="savingSummary">Meta de estudos</div><div class="progress"><div id="savingProgress" style="width:0%"></div></div><p class="sub" id="savingProjection"></p></div><div class="card"><h3>Registrar contribuição</h3><div class="field"><label>Valor (R$)</label><input id="savingAmount" min="0.01" placeholder="50,00" step="0.01" type="number"/></div><div class="field"><label>Data</label><input id="savingDate" type="date"/></div><div class="field"><label>Descrição</label><input id="savingNote" placeholder="Ex.: presente dos avós"/></div><button class="btn primary" id="addSaving">Adicionar contribuição</button></div><div class="card" style="grid-column:span 2"><h3>Histórico de contribuições</h3><div class="list" id="savingList"></div><p class="sub">Valores registrados pela família. As projeções são estimativas.</p></div></div></section>
+<div class="row" style="flex-wrap:wrap"><button class="btn primary" type="button" id="generatePrompt">✉ Enviar pergunta</button><button class="btn secondary" type="button" id="offlineTips">Ver dicas por idade</button><button class="btn secondary" type="button" id="copyPrompt">Copiar resposta</button></div>
+<div aria-live="polite" class="ai-answer" id="aiOutput">Digite uma pergunta para o assistente.</div><p class="sub" id="aiModeNotice">Dicas para cada fase da infância</p></div></div></section><section class="content" id="poupanca"><div class="grid"><div class="card hero"><div><div class="eyebrow">Planos para o futuro</div><h2>Poupança para os estudos 🎓</h2><p class="sub">Acompanhe quanto a família está reservando para educação.</p></div><div class="illustration">🎓</div></div><div class="card"><h3>Minha meta</h3><div class="field"><label>Objetivo (R$)</label><input id="savingGoal" min="0" step="0.01" type="number" value="10000"/></div><div class="field"><label>Saldo inicial (R$)</label><input id="savingStart" min="0" step="0.01" type="number" value="0"/></div><div class="field"><label>Contribuição mensal planejada (R$)</label><input id="savingMonthly" min="0" step="0.01" type="number" value="100"/></div><button class="btn primary" id="saveGoal">Salvar plano</button></div><div class="card"><h3>Meu progresso</h3><div class="metric" id="savedTotal">R$ 0,00</div><div class="sub" id="savingSummary">Meta de estudos</div><div class="progress"><div id="savingProgress" style="width:0%"></div></div><p class="sub" id="savingProjection"></p></div><div class="card"><h3>Registrar contribuição</h3><div class="field"><label>Valor (R$)</label><input id="savingAmount" min="0.01" placeholder="50,00" step="0.01" type="number"/></div><div class="field"><label>Data</label><input id="savingDate" type="date"/></div><div class="field"><label>Descrição</label><input id="savingNote" placeholder="Ex.: presente dos avós"/></div><button class="btn primary" id="addSaving">Adicionar contribuição</button></div><div class="card" style="grid-column:span 2"><h3>Histórico de contribuições</h3><div class="list" id="savingList"></div><p class="sub">Valores registrados pela família. As projeções são estimativas.</p></div></div></section>
 <footer class="foot">Meu Pequeno Mundo • Cuidando de cada descoberta • Orientações educativas não substituem o pediatra</footer></main></div>
 <script src="configuracao.js"></script>
 <script>'use strict';
@@ -211,34 +211,42 @@ function matchFamilyTopic(question,selected){
 document.querySelectorAll('#aiSuggestions [data-ask]').forEach(btn=>{
  btn.addEventListener('click',()=>{ $('aiExtra').value=btn.dataset.ask; $('generatePrompt').click(); });
 });
-$('aiModeNotice').textContent=/^https:\/\//i.test(configuredAiEndpoint)?'Assistente de IA online':'Dicas para cada fase da infância';
-$('generatePrompt').onclick=async()=>{
+const aiOnlineEnabled=/^https:\/\//i.test(configuredAiEndpoint);
+$('aiModeNotice').textContent=aiOnlineEnabled?'Assistente online disponível':'Assistente online ainda não ativado';
+$('offlineTips').onclick=()=>{
  const question=safeVal('aiExtra');
  const topic=matchFamilyTopic(question,$('aiTopic').value);
- const out=$('aiOutput'),button=$('generatePrompt');
- const offline=()=>fallback(topic,question);
- if(!/^https:\/\//i.test(configuredAiEndpoint)){
-   lastText=offline();out.textContent=lastText;
-   $('aiModeNotice').textContent='Dicas para cada fase da infância';
+ lastText=fallback(topic,question);
+ $('aiOutput').textContent=lastText;
+ $('aiModeNotice').textContent='Dicas para cada fase da infância';
+};
+$('aiExtra').addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('generatePrompt').click();}
+});
+$('generatePrompt').onclick=async()=>{
+ const question=safeVal('aiExtra');
+ const out=$('aiOutput'),button=$('generatePrompt'),notice=$('aiModeNotice');
+ if(!question){out.textContent='Escreva sua pergunta para enviar.';$('aiExtra').focus();return;}
+ if(!aiOnlineEnabled){
+   out.textContent='O assistente online ainda precisa ser ativado pelo responsável do site. Enquanto isso, use “Ver dicas por idade”.';
+   notice.textContent='Assistente online ainda não ativado';
    return;
  }
- out.textContent='Consultando assistente…';button.disabled=true;
+ const topic=matchFamilyTopic(question,$('aiTopic').value);
+ out.textContent='Enviando pergunta…';button.disabled=true;
+ const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),25000);
  try{
-  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),20000);
-  let response;
-  try{
-   response=await fetch(configuredAiEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,question,ageMonths:ageInMonths(data.profile?.birth)}),signal:controller.signal});
-  }finally{clearTimeout(timer)}
-  if(!response.ok)throw new Error('Serviço indisponível');
-  const payload=await response.json();
-  const answer=String(payload.answer||'').trim();
-  if(!answer)throw new Error('Resposta vazia');
-  lastText=answer;out.textContent=answer;
-  $('aiModeNotice').textContent='Resposta do assistente de IA';
+   const response=await fetch(configuredAiEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,question,ageMonths:ageInMonths(data.profile?.birth)}),signal:controller.signal});
+   const payload=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(response.status===429?'Limite de solicitações atingido. Tente novamente mais tarde.':'O serviço de IA não respondeu. Tente novamente mais tarde.');
+   const answer=String(payload.answer||'').trim();
+   if(!answer)throw new Error('Não foi possível obter uma resposta.');
+   lastText=answer;out.textContent=answer;
+   notice.textContent='Resposta gerada por IA';
  }catch(err){
-  lastText=offline();out.textContent='Veja algumas orientações para a família:\n\n'+lastText;
-  $('aiModeNotice').textContent='Dicas para cada fase da infância';
- }finally{button.disabled=false}
+   out.textContent=err.name==='AbortError'?'A resposta demorou mais que o esperado. Tente novamente.':err.message||'Não foi possível acessar o assistente.';
+   notice.textContent='Não foi possível conectar ao assistente';
+ }finally{clearTimeout(timer);button.disabled=false;}
 };
 $('copyPrompt').onclick=async()=>{let v=lastText||$('aiOutput').textContent;try{await navigator.clipboard.writeText(v);alert('Texto copiado!')}catch{alert('Selecione o texto para copiar.')}};
 let sp=data.savingPlan||defaults.savingPlan;for(let [id,k] of [['savingGoal','goal'],['savingStart','start'],['savingMonthly','monthly']])$(id).value=sp[k]??0;
