@@ -1,12 +1,20 @@
-MEU PEQUENO MUNDO — VERSÃO SEM CHAVE DE API
+MEU PEQUENO MUNDO — Versão com assistente educativo e integração opcional de IA online
 
-1. Publique index.html e configuracao.js no GitHub Pages, na mesma pasta.
-2. Em Músicas ou Vídeos, cole um link do YouTube na área de cadastro, informe um título e salve.
-3. No campo Buscar, pesquise pelos títulos já salvos neste navegador.
-4. Se colar diretamente um link no campo de busca, clique em Assistir aqui ou Salvar na lista.
-5. Vídeos são reproduzidos no player incorporado quando o YouTube permite incorporação.
-6. Não existe pesquisa global no YouTube sem uma API de pesquisa: a busca é apenas no catálogo salvo.
-7. Os favoritos e demais registros ficam no armazenamento local do navegador (não sincronizam entre aparelhos).
-8. O player é fornecido pelo YouTube e pode exibir conteúdo recomendado ou anúncios controlados pela plataforma. Supervisione o acesso infantil.
-9. A versão remove as chaves YouTube antes compartilhadas. Revogue as chaves antigas no Google Cloud se ainda estiverem ativas.
-10. A IA online continua opcional, configurável por endpoint HTTPS seguro. As dicas locais continuam disponíveis sem IA.
+PUBLICAR SITE:
+1. Envie index.html e configuracao.js para o GitHub Pages.
+2. Sem servidor de IA, o assistente oferece dicas educativas locais por faixa etária. NÃO são respostas geradas por IA.
+
+ATIVAR RESPOSTAS GERADAS POR IA (configuração do proprietário):
+1. Crie uma conta no Cloudflare e publique o conteúdo cloudflare-worker/worker.js como Cloudflare Worker (ou implante via Wrangler: npx wrangler deploy dentro de cloudflare-worker).
+2. Configure o Secret OPENAI_API_KEY no painel do Worker (Settings > Variables and Secrets). Não coloque esse segredo no GitHub, no HTML nem em configuracao.js.
+3. Ajuste ALLOWED_ORIGIN em wrangler.toml ao domínio do site, publique novamente. É a origem, sem caminho final. Se tiver domínio próprio, use-o.
+4. Copie a URL HTTPS final do Worker e coloque em configuracao.js: window.MPM_CONFIG = { aiEndpoint: 'https://seu-worker.workers.dev' };
+5. Reenvie configuracao.js ao GitHub e teste a IA online com uma pergunta. O serviço da IA poderá ter custos e limites próprios.
+6. Proteja o Worker contra uso abusivo com controles de acesso, rate limiting, cotas e monitoramento. A validação de Origin/CORS não é autenticação suficiente para impedir chamadas automatizadas.
+
+PRIVACIDADE E SEGURANÇA:
+- O site envia ao Worker somente assunto, pergunta digitada e idade EM MESES (quando cadastrada).
+- NÃO envie dados de identificação, doenças, documentos, telefone ou endereço da criança na pergunta.
+- O assistente é educacional, NÃO substitui atendimento pediátrico. Em urgências, procure atendimento imediato.
+- Os registros do acompanhamento continuam salvos localmente no navegador.
+- Músicas e desenhos continuam a funcionar por links incorporados do YouTube, sem chave de API; vídeos podem bloquear incorporação.

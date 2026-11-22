@@ -1,0 +1,8 @@
+name = "meu-pequeno-mundo-ia"
+main = "worker.js"
+compatibility_date = "2026-11-21"
+
+[vars]
+# Troque pelo endereço EXATO da página, sem / no final.
+ALLOWED_ORIGIN = "https://kaykodevcontato-afk.github.io"
+OPENAI_MODEL = "gpt-4.1-mini"
