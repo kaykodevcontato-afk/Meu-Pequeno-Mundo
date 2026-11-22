@@ -1,30 +1,12 @@
-MEU PEQUENO MUNDO — PLAYER YOUTUBE + PESQUISA
+MEU PEQUENO MUNDO — VERSÃO SEM CHAVE DE API
 
-ATUALIZAÇÃO
-- YouTube IFrame Player API integrada às áreas de músicas e desenhos.
-- Vídeos selecionados reproduzem dentro do site se o YouTube permitir.
-- Não há interrupção automática após 6 segundos (isso era somente no exemplo da documentação).
-- A sessão de desenhos mantém o limite definido no campo "Tempo por sessão" (10 minutos por padrão).
-- Se a API de player não carregar, os controles nativos do vídeo incorporado continuam disponíveis.
-- Interface pública não apresenta formulários técnicos de API.
-
-ATIVAR PESQUISA DENTRO DO SITE
-1. Entre em https://console.cloud.google.com/apis/library/youtube.googleapis.com e ative YouTube Data API v3.
-2. Crie credencial de chave API no Google Cloud; restrinja para seu domínio GitHub Pages e somente essa API. Configure cotas.
-3. Edite configuracao.js e preencha youtubeApiKey com a chave de uso no navegador, restrita por domínio e API.
-4. Envie index.html e configuracao.js à raiz do repositório GitHub Pages.
-
-ALTERNATIVA MAIS SEGURA
-Um endpoint HTTPS próprio configurado em youtubeSearchEndpoint permite manter a chave no servidor (ex.: Cloudflare Worker), com CORS, limites e autenticação adequados.
-
-SEM CHAVE
-A pesquisa de vídeos pelo nome no próprio site não é possível sem YouTube Data API v3 ou endpoint equivalente.
-Nesse caso, aparece apenas um link para buscar no YouTube e o usuário pode adicionar vídeos pelo link.
-
-OBSERVAÇÕES
-A IFrame Player API não realiza pesquisa. Alguns vídeos não permitem incorporação; a filtragem safeSearch não substitui supervisão parental.
-Não coloque segredos de backend em configuracao.js: o código do navegador é público.
-O pacote não contém o e-mail pessoal mencionado anteriormente.
-
-CHAVE CONFIGURADA NESTA VERSÃO
-A chave fornecida pelo proprietário foi inserida em configuracao.js. Ela fica PUBLICAMENTE VISÍVEL no GitHub Pages. Antes de publicar restrinja-a aos referenciadores do domínio no Google Cloud e apenas YouTube Data API v3. Como foi compartilhada em conversa, prefira revogá-la e substituí-la por uma nova chave. Para segredo real, use Cloudflare Worker com a chave armazenada como Secret e preencha youtubeSearchEndpoint.
+1. Publique index.html e configuracao.js no GitHub Pages, na mesma pasta.
+2. Em Músicas ou Vídeos, cole um link do YouTube na área de cadastro, informe um título e salve.
+3. No campo Buscar, pesquise pelos títulos já salvos neste navegador.
+4. Se colar diretamente um link no campo de busca, clique em Assistir aqui ou Salvar na lista.
+5. Vídeos são reproduzidos no player incorporado quando o YouTube permite incorporação.
+6. Não existe pesquisa global no YouTube sem uma API de pesquisa: a busca é apenas no catálogo salvo.
+7. Os favoritos e demais registros ficam no armazenamento local do navegador (não sincronizam entre aparelhos).
+8. O player é fornecido pelo YouTube e pode exibir conteúdo recomendado ou anúncios controlados pela plataforma. Supervisione o acesso infantil.
+9. A versão remove as chaves YouTube antes compartilhadas. Revogue as chaves antigas no Google Cloud se ainda estiverem ativas.
+10. A IA online continua opcional, configurável por endpoint HTTPS seguro. As dicas locais continuam disponíveis sem IA.
