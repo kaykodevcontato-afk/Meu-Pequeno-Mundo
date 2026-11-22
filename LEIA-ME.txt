@@ -25,3 +25,6 @@ OBSERVAÇÕES
 A IFrame Player API não realiza pesquisa. Alguns vídeos não permitem incorporação; a filtragem safeSearch não substitui supervisão parental.
 Não coloque segredos de backend em configuracao.js: o código do navegador é público.
 O pacote não contém o e-mail pessoal mencionado anteriormente.
+
+CHAVE CONFIGURADA NESTA VERSÃO
+A chave fornecida pelo proprietário foi inserida em configuracao.js. Ela fica PUBLICAMENTE VISÍVEL no GitHub Pages. Antes de publicar restrinja-a aos referenciadores do domínio no Google Cloud e apenas YouTube Data API v3. Como foi compartilhada em conversa, prefira revogá-la e substituí-la por uma nova chave. Para segredo real, use Cloudflare Worker com a chave armazenada como Secret e preencha youtubeSearchEndpoint.

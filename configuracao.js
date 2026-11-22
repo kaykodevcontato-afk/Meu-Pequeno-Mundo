@@ -6,5 +6,5 @@
 window.MPM_CONFIG = {
   aiEndpoint: '',
   youtubeSearchEndpoint: '', // Exemplo: 'https://seu-servidor.example/api/youtube'
-  youtubeApiKey: '' // Chave pública RESTRITA por referer e API.
+  youtubeApiKey: 'AIzaSyB4uqoXc2bXX8LQxt2uEn8_mcFa3U4cvns' // Chave pública RESTRITA por referer e API.
 };
