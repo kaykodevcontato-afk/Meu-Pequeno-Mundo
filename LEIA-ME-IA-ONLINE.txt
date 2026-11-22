@@ -1,0 +1,51 @@
+MEU PEQUENO MUNDO — ASSISTENTE COM IA ONLINE
+=============================================
+
+O site já está preparado para obter respostas reais de IA. Porém, para funcionar
+online, você deve publicar o Cloudflare Worker e configurar uma chave de API da
+OpenAI na conta do Worker. Não é necessária nenhuma chave do YouTube.
+
+PASSO 1 — OBTER UMA CHAVE DA OPENAI
+- Acesse https://platform.openai.com/api-keys
+- Crie uma chave de API; a API é um serviço cobrado à parte do ChatGPT.
+- NÃO compartilhe nem coloque essa chave em HTML, GitHub, configuracao.js ou prints.
+
+PASSO 2 — PUBLICAR O SERVIDOR SEGURO
+- Entre em https://dash.cloudflare.com/ e abra Workers & Pages.
+- Crie um Worker e use o código presente em cloudflare-worker/worker.js.
+- Configure em Settings > Variables and Secrets:
+   OPENAI_API_KEY = [sua chave, tipo SECRET]
+   ALLOWED_ORIGIN = https://SEU-USUARIO.github.io   (tipo texto, SEM barra final)
+- Opcional: OPENAI_MODEL = gpt-4.1-mini
+- Implante/publice o Worker. Guarde a URL https://...workers.dev
+
+IMPORTANTE PARA GITHUB PAGES:
+ALLOWED_ORIGIN usa a ORIGEM, sem caminho do repositório.
+Exemplo: se seu site é https://usuario.github.io/meu-pequeno-mundo/
+a origem é https://usuario.github.io.
+
+PASSO 3 — CONECTAR O SITE
+- No arquivo configuracao.js, altere:
+  window.MPM_CONFIG = { aiEndpoint: 'https://SEU-WORKER.workers.dev' };
+- Publique index.html e configuracao.js juntos no GitHub Pages.
+- Acesse o site pelo endereço HTTPS publicado, vá em Assistente da família
+  e faça uma pergunta. O site envia tema, texto da pergunta e idade em meses
+  (caso exista); a resposta aparece na própria página.
+
+SE NÃO FUNCIONAR
+- Verifique se ALLOWED_ORIGIN coincide exatamente com a origem do site.
+- Confirme se OPENAI_API_KEY foi cadastrada como Secret no Worker.
+- Confira se há créditos/faturamento e permissão para usar o modelo na conta de API.
+- Teste no GitHub Pages; abrir index.html como arquivo local não funciona com
+  as proteções de origem previstas no Worker.
+- Ao falhar o serviço, o site continua oferecendo dicas prontas.
+
+SEGURANÇA E LIMITES
+- Não envie nome completo, endereço, documentos ou histórico médico da criança à IA.
+- Orientações sobre saúde não substituem um profissional; emergências exigem
+  atendimento presencial.
+- A chave permanece no servidor, mas o endpoint público ainda pode ser abusado:
+  antes de divulgar comercialmente configure rate limiting, proteção anti-bot,
+  alertas e limites de gastos no serviço de IA.
+- O site é estático; publicar somente o HTML não ativa a IA online.
+- Respostas de IA podem conter erros e precisam de supervisão dos responsáveis.

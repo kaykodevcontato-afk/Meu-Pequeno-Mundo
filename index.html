@@ -23,7 +23,7 @@
 <div class="card full"><div class="ai-chip-row" id="aiSuggestions"><button type="button" class="btn secondary" data-ask="Que brincadeiras posso fazer hoje?">🧩 Brincadeiras</button><button type="button" class="btn secondary" data-ask="Como criar uma rotina de sono tranquila e segura?">🌙 Sono</button><button type="button" class="btn secondary" data-ask="Quais cuidados gerais com a alimentação nesta idade?">🥣 Alimentação</button><button type="button" class="btn secondary" data-ask="Como estimular a linguagem e o aprendizado com brincadeiras?">📚 Aprendizado</button><button type="button" class="btn secondary" data-ask="Que atividades posso fazer sem telas?">🎨 Atividades sem telas</button></div>
 <div class="formgrid"><div class="field"><label for="aiTopic">Assunto</label><select id="aiTopic"><option>Brincadeiras para a idade</option><option>Educação e desenvolvimento</option><option>Alimentação adequada à idade</option><option>Sono e rotina</option><option>Leitura e primeiras palavras</option><option>Perguntas para o pediatra</option><option>Planejamento dos estudos</option></select></div><div class="field"><label for="aiExtra">O que você gostaria de saber?</label><textarea id="aiExtra" rows="3" placeholder="Ex.: Que brincadeira é adequada para um bebê de 8 meses?" maxlength="500"></textarea></div></div>
 <div class="row" style="flex-wrap:wrap"><button class="btn primary" id="generatePrompt">✨ Pedir orientação</button><button class="btn secondary" id="copyPrompt">Copiar resposta</button></div>
-<div aria-live="polite" class="ai-answer" id="aiOutput">Escolha um tema acima ou escreva sua pergunta.</div><p class="sub" id="aiModeNotice">Orientações educativas disponíveis. A IA online depende da conexão do serviço.</p><p class="hint">Evite inserir nome completo, endereço, documentos ou dados médicos da criança. Em caso de urgência, procure atendimento presencial.</p></div></div></section><section class="content" id="poupanca"><div class="grid"><div class="card hero"><div><div class="eyebrow">Planos para o futuro</div><h2>Poupança para os estudos 🎓</h2><p class="sub">Acompanhe quanto a família está reservando para educação.</p></div><div class="illustration">🎓</div></div><div class="card"><h3>Minha meta</h3><div class="field"><label>Objetivo (R$)</label><input id="savingGoal" min="0" step="0.01" type="number" value="10000"/></div><div class="field"><label>Saldo inicial (R$)</label><input id="savingStart" min="0" step="0.01" type="number" value="0"/></div><div class="field"><label>Contribuição mensal planejada (R$)</label><input id="savingMonthly" min="0" step="0.01" type="number" value="100"/></div><button class="btn primary" id="saveGoal">Salvar plano</button></div><div class="card"><h3>Meu progresso</h3><div class="metric" id="savedTotal">R$ 0,00</div><div class="sub" id="savingSummary">Meta de estudos</div><div class="progress"><div id="savingProgress" style="width:0%"></div></div><p class="sub" id="savingProjection"></p></div><div class="card"><h3>Registrar contribuição</h3><div class="field"><label>Valor (R$)</label><input id="savingAmount" min="0.01" placeholder="50,00" step="0.01" type="number"/></div><div class="field"><label>Data</label><input id="savingDate" type="date"/></div><div class="field"><label>Descrição</label><input id="savingNote" placeholder="Ex.: presente dos avós"/></div><button class="btn primary" id="addSaving">Adicionar contribuição</button></div><div class="card" style="grid-column:span 2"><h3>Histórico de contribuições</h3><div class="list" id="savingList"></div><p class="sub">Valores registrados pela família. As projeções são estimativas.</p></div></div></section>
+<div aria-live="polite" class="ai-answer" id="aiOutput">Escolha um tema acima ou escreva sua pergunta.</div><p class="sub" id="aiModeNotice">Dicas para cada fase da infância</p></div></div></section><section class="content" id="poupanca"><div class="grid"><div class="card hero"><div><div class="eyebrow">Planos para o futuro</div><h2>Poupança para os estudos 🎓</h2><p class="sub">Acompanhe quanto a família está reservando para educação.</p></div><div class="illustration">🎓</div></div><div class="card"><h3>Minha meta</h3><div class="field"><label>Objetivo (R$)</label><input id="savingGoal" min="0" step="0.01" type="number" value="10000"/></div><div class="field"><label>Saldo inicial (R$)</label><input id="savingStart" min="0" step="0.01" type="number" value="0"/></div><div class="field"><label>Contribuição mensal planejada (R$)</label><input id="savingMonthly" min="0" step="0.01" type="number" value="100"/></div><button class="btn primary" id="saveGoal">Salvar plano</button></div><div class="card"><h3>Meu progresso</h3><div class="metric" id="savedTotal">R$ 0,00</div><div class="sub" id="savingSummary">Meta de estudos</div><div class="progress"><div id="savingProgress" style="width:0%"></div></div><p class="sub" id="savingProjection"></p></div><div class="card"><h3>Registrar contribuição</h3><div class="field"><label>Valor (R$)</label><input id="savingAmount" min="0.01" placeholder="50,00" step="0.01" type="number"/></div><div class="field"><label>Data</label><input id="savingDate" type="date"/></div><div class="field"><label>Descrição</label><input id="savingNote" placeholder="Ex.: presente dos avós"/></div><button class="btn primary" id="addSaving">Adicionar contribuição</button></div><div class="card" style="grid-column:span 2"><h3>Histórico de contribuições</h3><div class="list" id="savingList"></div><p class="sub">Valores registrados pela família. As projeções são estimativas.</p></div></div></section>
 <footer class="foot">Meu Pequeno Mundo • Cuidando de cada descoberta • Orientações educativas não substituem o pediatra</footer></main></div>
 <script src="configuracao.js"></script>
 <script>'use strict';
@@ -211,7 +211,7 @@ function matchFamilyTopic(question,selected){
 document.querySelectorAll('#aiSuggestions [data-ask]').forEach(btn=>{
  btn.addEventListener('click',()=>{ $('aiExtra').value=btn.dataset.ask; $('generatePrompt').click(); });
 });
-$('aiModeNotice').textContent=/^https:\/\//i.test(configuredAiEndpoint)?'Assistente de IA online disponível • Respostas educativas.':'Sugestões educativas por faixa etária • IA online ainda não conectada.';
+$('aiModeNotice').textContent=/^https:\/\//i.test(configuredAiEndpoint)?'Assistente de IA online':'Dicas para cada fase da infância';
 $('generatePrompt').onclick=async()=>{
  const question=safeVal('aiExtra');
  const topic=matchFamilyTopic(question,$('aiTopic').value);
@@ -219,7 +219,7 @@ $('generatePrompt').onclick=async()=>{
  const offline=()=>fallback(topic,question);
  if(!/^https:\/\//i.test(configuredAiEndpoint)){
    lastText=offline();out.textContent=lastText;
-   $('aiModeNotice').textContent='Sugestões educativas por faixa etária • IA online ainda não conectada.';
+   $('aiModeNotice').textContent='Dicas para cada fase da infância';
    return;
  }
  out.textContent='Consultando assistente…';button.disabled=true;
@@ -234,10 +234,10 @@ $('generatePrompt').onclick=async()=>{
   const answer=String(payload.answer||'').trim();
   if(!answer)throw new Error('Resposta vazia');
   lastText=answer;out.textContent=answer;
-  $('aiModeNotice').textContent='Resposta criada por IA • Confira orientações de saúde com o pediatra.';
+  $('aiModeNotice').textContent='Resposta do assistente de IA';
  }catch(err){
-  lastText=offline();out.textContent='Não foi possível acessar a IA online. Veja estas orientações educativas:\n\n'+lastText;
-  $('aiModeNotice').textContent='Orientações gerais disponíveis • Serviço de IA temporariamente indisponível.';
+  lastText=offline();out.textContent='Veja algumas orientações para a família:\n\n'+lastText;
+  $('aiModeNotice').textContent='Dicas para cada fase da infância';
  }finally{button.disabled=false}
 };
 $('copyPrompt').onclick=async()=>{let v=lastText||$('aiOutput').textContent;try{await navigator.clipboard.writeText(v);alert('Texto copiado!')}catch{alert('Selecione o texto para copiar.')}};
